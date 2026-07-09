@@ -1,6 +1,7 @@
 import hashlib
 import platform
 import os
+from .logger import logger
 
 HWID_FILE = 'config/hwid.key'
 
@@ -24,17 +25,17 @@ def check_hwid(allowed_hwid: str | None = None) -> bool:
     current_hwid = generate_hwid()
     if not os.path.exists(HWID_FILE):
         save_hwid(current_hwid)
-        print(f"[HWID Manager] Generated and saved new HWID: {current_hwid}")
+        logger.info(f"[HWID Manager] Generated and saved new HWID: {current_hwid}")
         return True # First run, allow access
 
     saved_hwid = load_hwid()
 
     if allowed_hwid and saved_hwid == allowed_hwid:
-        print(f"[HWID Manager] HWID matched with provided allowed HWID: {saved_hwid}")
+        logger.info(f"[HWID Manager] HWID matched with provided allowed HWID: {saved_hwid}")
         return True
     elif not allowed_hwid and saved_hwid == current_hwid:
-        print(f"[HWID Manager] HWID matched with saved HWID: {saved_hwid}")
+        logger.info(f"[HWID Manager] HWID matched with saved HWID: {saved_hwid}")
         return True
     else:
-        print(f"[HWID Manager] HWID mismatch! Current: {current_hwid}, Saved: {saved_hwid}, Allowed: {allowed_hwid}")
+        logger.critical(f"[HWID Manager] HWID mismatch! Current: {current_hwid}, Saved: {saved_hwid}, Allowed: {allowed_hwid}")
         return False

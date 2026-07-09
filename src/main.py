@@ -1,26 +1,20 @@
+
+
 import asyncio
 import logging
 import time
-import sys
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.client.default import DefaultBotProperties
 
-import sys
-import os
-
-# Add the project root to sys.path to enable absolute imports
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, project_root)
-
 from config.config import BOT_TOKEN, ALLOWED_HWID, ADMIN_ID, PROXIES, APIS
-from keyboards import main_menu_keyboard, settings_menu_keyboard, back_to_main_menu_keyboard
+from src.keyboards import main_menu_keyboard, settings_menu_keyboard, back_to_main_menu_keyboard
 from src.logger import logger
-from hwid_manager import check_hwid, generate_hwid
-from proxy_manager import ProxyManager
-from data_hunter import DataHunter
+from src.hwid_manager import check_hwid, generate_hwid
+from src.proxy_manager import ProxyManager
+from src.data_hunter import DataHunter
 
 # Configure logging (already done in logger.py, just use the logger instance)
 
