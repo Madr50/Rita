@@ -1,4 +1,10 @@
+import sys
+import os
 
+# Ensure the project root is in sys.path for module discovery
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 import asyncio
 import logging
@@ -9,17 +15,35 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.client.default import DefaultBotProperties
 
-from config.config import BOT_TOKEN, ALLOWED_HWID, ADMIN_ID, PROXIES, APIS
-from src.keyboards import main_menu_keyboard, settings_menu_keyboard, back_to_main_menu_keyboard
-from src.logger import logger
-from src.hwid_manager import check_hwid, generate_hwid
-from src.proxy_manager import ProxyManager
-from src.data_hunter import DataHunter
+# Direct imports from the top-level packages
+from config import config
+from src import keyboards
+from src import logger as logger_module
+from src import hwid_manager
+from src import proxy_manager
+from src import data_hunter
+
+# Access attributes directly from the imported modules
+BOT_TOKEN = config.BOT_TOKEN
+ALLOWED_HWID = config.ALLOWED_HWID
+ADMIN_ID = config.ADMIN_ID
+PROXIES = config.PROXIES
+APIS = config.APIS
+
+main_menu_keyboard = keyboards.main_menu_keyboard
+settings_menu_keyboard = keyboards.settings_menu_keyboard
+back_to_main_menu_keyboard = keyboards.back_to_main_menu_keyboard
+
+logger = logger_module.logger
+check_hwid = hwid_manager.check_hwid
+generate_hwid = hwid_manager.generate_hwid
+ProxyManager = proxy_manager.ProxyManager
+DataHunter = data_hunter.DataHunter
 
 # Configure logging (already done in logger.py, just use the logger instance)
 
 async def simulate_hunt_progress(message: types.Message, total_steps: int):
-    # This function remains the same as it\'s part of the UI
+    # This function remains the same as it's part of the UI
     for i in range(total_steps + 1):
         progress = int((i / total_steps) * 100)
         progress_bar = "█" * (progress // 5) + "░" * (20 - (progress // 5))
@@ -32,7 +56,7 @@ async def simulate_hunt_progress(message: types.Message, total_steps: int):
     return sent_message
 
 def generate_hunt_result_message(data: dict) -> str:
-    # This function remains the same as it\'s part of the UI
+    # This function remains the same as it's part of the UI
     message_text = "<b>✅ تم العثور على بيانات!</b>\n\n"
     message_text += "<pre>" # Using <pre> for fixed-width font for table alignment
     message_text += "| المفتاح       | القيمة        |\n"
@@ -111,8 +135,8 @@ async def main():
             "الرجاء إدخال استعلام البحث:",
             reply_markup=back_to_main_menu_keyboard()
         )
-        # Here, you would typically wait for the user\'s input for the query
-        # For demonstration, let\'s use a dummy query and simulate the hunt
+        # Here, you would typically wait for the user's input for the query
+        # For demonstration, let's use a dummy query and simulate the hunt
         query = "dummy_query"
 
         # Simulate progress bar
