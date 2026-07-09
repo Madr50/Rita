@@ -17,7 +17,7 @@ sys.path.insert(0, project_root)
 
 from config.config import BOT_TOKEN, ALLOWED_HWID, ADMIN_ID, PROXIES, APIS
 from keyboards import main_menu_keyboard, settings_menu_keyboard, back_to_main_menu_keyboard
-from logger import logger
+from src.logger import logger
 from hwid_manager import check_hwid, generate_hwid
 from proxy_manager import ProxyManager
 from data_hunter import DataHunter
