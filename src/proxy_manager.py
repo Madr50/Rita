@@ -3,7 +3,7 @@ import asyncio
 import random
 from typing import List, Dict, Optional
 
-from logger import logger
+from src.logger import logger
 
 class ProxyManager:
     def __init__(self, proxies: List[str]):

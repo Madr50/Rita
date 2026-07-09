@@ -2,8 +2,8 @@ import asyncio
 import httpx
 from typing import List, Dict, Any, Optional
 
-from logger import logger
-from proxy_manager import ProxyManager
+from src.logger import logger
+from src.proxy_manager import ProxyManager
 
 class DataHunter:
     def __init__(self, apis: List[Dict[str, str]], proxy_manager: ProxyManager, max_concurrent_requests: int = 10):
