@@ -8,6 +8,11 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.client.default import DefaultBotProperties
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from config.config import BOT_TOKEN, ALLOWED_HWID, ADMIN_ID, PROXIES, APIS
 from keyboards import main_menu_keyboard, settings_menu_keyboard, back_to_main_menu_keyboard
 from logger import logger
