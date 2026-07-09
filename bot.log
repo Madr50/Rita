@@ -1,0 +1,5 @@
+2026-07-09 23:51:10,427 - src.logger - INFO - Starting bot initialization...
+2026-07-09 23:51:10,430 - src.logger - INFO - [HWID Manager] Generated and saved new HWID: 23525235305b5ec6c3abd97465f4e33b3c2122bc0f28b53de793ea29671f7960
+2026-07-09 23:51:10,430 - src.logger - INFO - HWID check passed.
+2026-07-09 23:51:10,620 - aiogram.dispatcher - INFO - Start polling
+2026-07-09 23:51:12,839 - aiogram.dispatcher - INFO - Run polling for bot @twitterxcheckerusername_bot id=8654290922 - 'twitter usernames checker'

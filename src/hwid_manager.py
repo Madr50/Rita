@@ -1,7 +1,7 @@
 import hashlib
 import platform
 import os
-from .logger import logger
+from src.logger import logger
 
 HWID_FILE = 'config/hwid.key'
 
@@ -21,7 +21,9 @@ def load_hwid():
             return f.read().strip()
     return None
 
-def check_hwid(allowed_hwid: str | None = None) -> bool:
+from typing import Optional
+
+def check_hwid(allowed_hwid: Optional[str] = None) -> bool:
     current_hwid = generate_hwid()
     if not os.path.exists(HWID_FILE):
         save_hwid(current_hwid)

@@ -2,6 +2,7 @@ import sys
 import os
 
 # Ensure the project root is in sys.path for module discovery
+# This must be at the very top to affect all subsequent imports.
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
