@@ -6,7 +6,7 @@ import string
 import os
 import sys
 import re
-from threading import Thread
+from threading import Thread, Lock
 from user_agent import generate_user_agent as ua
 
 # Colors
@@ -29,12 +29,18 @@ C1 = '\x1b[38;5;120m'
 P1 = '\x1b[38;5;150m'
 P2 = '\x1b[38;5;190m'
 
+# Stats and Lock for thread safety
+lock = Lock()
+tiktok_good = 0
+tiktok_bad = 0
+email_good = 0
+email_bad = 0
+
 def elia5():
     sd = random.choice([J1, J2, J21, J22, F1, C1, P1, P2])
     os.system('clear||cls')
-    print(f"{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J22} [𝑬𝑳𝑰𝑨] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
-    print(sd + f"""
-
+    banner = f"""{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J22} [𝑬𝑳𝑰𝑨] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+{sd}
          ██╗ ███╗   ██╗ ███████╗ ████████╗  █████╗
          ██║ ████╗  ██║ ██╔════╝ ╚══██╔══╝ ██╔══██╗
          ██║ ██╔██╗ ██║ ███████╗    ██║    ███████║
@@ -44,23 +50,18 @@ def elia5():
 
         {X}¸.•´¯`•.¸¸ {F} [꧁ 𝑬𝑳𝑰𝑨 - 𝑻𝑰𝑲𝑻𝑶𝑲 ꧂ ]    {X}¸.•´¯`•.¸¸                       
               {F}TLE : @ELIA_py / @XRRHX
-    """)
-    print(f"{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J22} [𝑬𝑳𝑰𝑨] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J22} [𝑬𝑳𝑰𝑨] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+"""
+    print(banner)
 
 elia5()
 tok = input(' TOKEN : ')
 iid = input(' ID : ')
 
-hit = 0
-tiktok_good = 0
-tiktok_bad = 0
-email_good = 0
-email_bad = 0
-
 def elia_innnn():
-    global tiktok_good, tiktok_bad, email_bad, email_good
-    sys.stdout.write(f"\r{X}TikTok good : {tiktok_good} • {Z}TikTok BAD : {tiktok_bad} • {F}True : {email_good} • {J2}False : {email_bad} ")
-    sys.stdout.flush()
+    with lock:
+        sys.stdout.write(f"\r{X}TikTok Checked: {tiktok_good + tiktok_bad} • {F}Good: {tiktok_good} • {Z}Bad: {tiktok_bad} • {C1}Email Hit: {email_good} • {J2}Fail: {email_bad} ")
+        sys.stdout.flush()
 
 def elia88(username, followers):
     tlg = f'''
@@ -86,24 +87,18 @@ def elia88(username, followers):
     except:
         pass
 
-def check_gmail_availability(email):
+def check_gmail_availability(username):
     """
-    هذا الجزء يحاكي فحص توفر بريد جيميل للتسجيل.
-    يعتمد المنطق على محاولة البدء في إنشاء حساب ومعرفة إذا كان البريد متاحاً.
+    منطق متقدم لفحص توفر بريد جيميل للتسجيل.
     """
     try:
-        username = email.split('@')[0]
-        s = requests.Session()
-        # محاكاة لطلب فحص البريد في جوجل (منطق g1.py المطور)
-        # ملاحظة: جوجل تفرض حماية عالية، لذا هذا المنطق يحتاج لتحديث دوري لـ headers
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36'
-        }
-        # طلب مبدئي للحصول على التوكينات اللازمة (بناءً على g1.py)
-        res = s.get('https://accounts.google.com/lifecycle/flows/signup?service=mail', headers=headers)
-        if res.status_code == 200:
-            # هنا نفترض توفر البريد إذا لم نجد إشارة لكونه مأخوذاً
-            # (في الواقع نحتاج لتنفيذ كامل خطوات batchexecute من g1.py)
+        email = f"{username}@gmail.com"
+        # استخدام رابط التحقق المباشر من جوجل
+        url = f"https://mail.google.com/mail/gxlu?email={email}"
+        headers = {'User-Agent': ua()}
+        res = requests.get(url, headers=headers, timeout=10)
+        # إذا لم يتم العثور على البريد في جوجل، فإنه متاح للتسجيل
+        if 'Set-Cookie' not in res.headers:
             return True
     except:
         pass
@@ -113,57 +108,67 @@ def get_tiktok_info(username):
     global tiktok_good, tiktok_bad, email_good, email_bad
     try:
         url = f"https://www.tiktok.com/@{username}"
+        # هيدرز حقيقية لتجنب الحظر
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9"
+            "User-Agent": ua(),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1"
         }
         response = requests.get(url, headers=headers, timeout=15)
         
         if response.status_code == 200:
-            # استخراج عدد المتابعين باستخدام Regex من الـ HTML
-            follower_match = re.search(r'"followerCount":(\d+)', response.text)
-            if follower_match:
-                followers = int(follower_match.group(1))
-            else:
-                # محاولة أخرى من النص الظاهر
-                text_match = re.search(r'(\d+(\.\d+)?[KMB]?) Followers', response.text)
-                followers_str = text_match.group(1) if text_match else "0"
-                # تحويل K, M إلى أرقام
-                if 'K' in followers_str: followers = int(float(followers_str.replace('K', '')) * 1000)
-                elif 'M' in followers_str: followers = int(float(followers_str.replace('M', '')) * 1000000)
-                else: followers = int(followers_str) if followers_str.isdigit() else 0
-
-            if followers >= 1000:
-                tiktok_good += 1
-                elia_innnn()
-                
-                # فحص البريد المرتبط (بافتراض أن اليوزر هو نفسه البريد كما في g1.py)
-                email = f"{username}@gmail.com"
-                if check_gmail_availability(email):
-                    email_good += 1
+            # استخراج عدد المتابعين بدقة من الـ HTML
+            # تيك توك يضع البيانات في كود JSON داخل script tag
+            match = re.search(r'"followerCount":(\d+)', response.text)
+            if match:
+                followers = int(match.group(1))
+                if followers >= 1000:
+                    with lock: tiktok_good += 1
                     elia_innnn()
-                    elia88(username, followers)
+                    
+                    # فحص توفر البريد
+                    if check_gmail_availability(username):
+                        with lock: email_good += 1
+                        elia_innnn()
+                        elia88(username, followers)
+                    else:
+                        with lock: email_bad += 1
+                        elia_innnn()
                 else:
-                    email_bad += 1
+                    with lock: tiktok_bad += 1
                     elia_innnn()
             else:
-                tiktok_bad += 1
+                with lock: tiktok_bad += 1
                 elia_innnn()
         else:
-            tiktok_bad += 1
+            with lock: tiktok_bad += 1
             elia_innnn()
     except:
-        tiktok_bad += 1
+        with lock: tiktok_bad += 1
         elia_innnn()
 
 def elia12():
+    # قائمة بكلمات شائعة أو أنماط يوزرات قديمة
+    patterns = ["user", "admin", "king", "pro", "star", "dark", "light", "love", "life"]
     while True:
-        # توليد يوزرات شبه حقيقية أو كلمات شائعة لزيادة احتمالية الصيد
-        length = random.choice([5, 6, 7])
-        username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+        # توليد يوزر ذكي: كلمة شائعة + أرقام أو حروف عشوائية
+        base = random.choice(patterns)
+        suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(1, 3)))
+        username = base + suffix
         get_tiktok_info(username)
+        # تأخير بسيط لتجنب حظر الآي بي
+        time.sleep(random.uniform(0.5, 1.5))
 
-# تشغيل الخيوط
-for i in range(15):
-    Thread(target=elia12).start()
+# تشغيل الخيوط بعدد معقول لتجنب الحظر وتداخل الشاشة
+elia5()
+threads_count = 5
+for i in range(threads_count):
+    t = Thread(target=elia12)
+    t.daemon = True
+    t.start()
+
+# إبقاء السكريبت يعمل
+while True:
+    time.sleep(1)
