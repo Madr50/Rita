@@ -3,7 +3,7 @@ import asyncio
 import random
 from typing import List, Dict, Optional
 
-from src.logger import logger
+from .logger import logger
 
 class ProxyManager:
     def __init__(self, proxies: List[str]):
@@ -24,7 +24,7 @@ class ProxyManager:
             async with httpx.AsyncClient(proxies={"all": proxy}, timeout=timeout) as client:
                 response = await client.get("https://api.ipify.org?format=json")
                 response.raise_for_status()
-                logger.info(f"Proxy {proxy} is working. IP: {response.json().get(\'ip\')}")
+                logger.info(f'Proxy {proxy} is working. IP: {response.json().get("ip")}')
                 return True
         except httpx.RequestError as e:
             logger.warning(f"Proxy {proxy} failed: {e}")
