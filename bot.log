@@ -9,3 +9,6 @@
 2026-07-10 00:08:22,979 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
 2026-07-10 00:08:22,979 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8654290922)
 2026-07-10 00:14:42,782 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8654290922)
+2026-07-10 00:36:51,396 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2026-07-10 00:36:51,397 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8654290922)
+2026-07-10 00:37:04,389 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8654290922)
