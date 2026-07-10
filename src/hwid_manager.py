@@ -3,7 +3,7 @@ import platform
 import os
 from src.logger import logger
 
-HWID_FILE = 'config/hwid.key'
+HWID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config', 'hwid.key')
 
 def generate_hwid():
     # In a real scenario, this would generate a unique ID based on hardware.
@@ -12,6 +12,7 @@ def generate_hwid():
     return hashlib.sha256(system_info.encode()).hexdigest()
 
 def save_hwid(hwid: str):
+    os.makedirs(os.path.dirname(HWID_FILE), exist_ok=True)
     with open(HWID_FILE, 'w') as f:
         f.write(hwid)
 
